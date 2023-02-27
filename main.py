@@ -1,3 +1,3 @@
 # main program loop
 
-import io, board
+import game_io, board
