@@ -7,6 +7,11 @@ class TestBoard(unittest.TestCase):
         self.board_3x3 = Board([['M', '.', '.'],
                                 ['.', '.', '.'],
                                 ['.', '.', '.']])
+        self.board_5x5 = Board([['M', '.', '.', '.', '.'],
+                                ['.', '.', '.', '.', '.'],
+                                ['.', '.', 'M', '.', '.'],
+                                ['.', '.', '.', '.', '.'],
+                                ['.', '.', '.', '.', '.']])
 
     def test_init(self):
         self.assertEqual(self.board_3x3.width, 3)
@@ -59,6 +64,7 @@ class TestBoard(unittest.TestCase):
         self.assertEqual(0, self.board_3x3._Board__adjacent_mine_count(2, 2))
 
     def test_poke(self):
+        # 3x3
         self.assertFalse(self.board_3x3.poke(1, 1))
         self.assertEqual([['H', 'H', 'H'],
                           ['H', '1', 'H'],
@@ -68,6 +74,38 @@ class TestBoard(unittest.TestCase):
                           ['1', '1', '0'],
                           ['0', '0', '0']], self.board_3x3._Board__v_board)
         self.assertTrue(self.board_3x3.poke(0, 0))
+        # 5x5
+        self.assertFalse(self.board_5x5.poke(1, 1))
+        self.assertEqual([['H', 'H', 'H', 'H', 'H'],
+                          ['H', '2', 'H', 'H', 'H'],
+                          ['H', 'H', 'H', 'H', 'H'],
+                          ['H', 'H', 'H', 'H', 'H'],
+                          ['H', 'H', 'H', 'H', 'H']], self.board_5x5._Board__v_board)
+        self.assertFalse(self.board_5x5.poke(4, 4))
+        self.assertEqual([['H', '1', '0', '0', '0'],
+                          ['1', '2', '1', '1', '0'],
+                          ['0', '1', 'H', '1', '0'],
+                          ['0', '1', '1', '1', '0'],
+                          ['0', '0', '0', '0', '0']], self.board_5x5._Board__v_board)
+        
+
+    def test_flag(self):
+        self.assertTrue(self.board_3x3.flag(1, 1))
+        self.assertEqual([['H', 'H', 'H'],
+                          ['H', 'F', 'H'],
+                          ['H', 'H', 'H']], self.board_3x3._Board__v_board)
+        self.assertTrue(self.board_3x3.flag(1, 1))
+        self.assertEqual([['H', 'H', 'H'],
+                          ['H', 'H', 'H'],
+                          ['H', 'H', 'H']], self.board_3x3._Board__v_board)
+        self.assertFalse(self.board_3x3.poke(1, 1))
+        self.assertEqual([['H', 'H', 'H'],
+                          ['H', '1', 'H'],
+                          ['H', 'H', 'H']], self.board_3x3._Board__v_board)
+        self.assertFalse(self.board_3x3.flag(1, 1))
+        self.assertEqual([['H', 'H', 'H'],
+                          ['H', '1', 'H'],
+                          ['H', 'H', 'H']], self.board_3x3._Board__v_board)
 
 
 if __name__ == '__main__':

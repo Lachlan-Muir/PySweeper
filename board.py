@@ -46,7 +46,6 @@ class Board:
         # The board visible to the player
         self.__v_board = [[self.__HIDDEN_TILE for i in range(self.width)] for j in range(self.height)]
 
-
     def __str__(self):
         """
          x 0 1 2 3 4 ...
@@ -154,11 +153,27 @@ class Board:
     def flag(self, x, y):
         """
         Takes x and y coordinates and places a flag at that location on the board visible to the player. The hidden
-        board is not modified. If a tile containing a flag is flagged, it will be reverted to a hidden tile.
+        board is not modified. If a tile containing a flag is flagged, it will be reverted to a hidden tile. If the tile
+        is neither a hidden tile nor a flagged tile, flag() will do nothing.
+
         :param x: the x-axis coordinate
         :param y: the y-axis coordinate
-        :return: None
+        :return: True if a tile was flagged or unflagged, False if nothing was done.
         """
         # make sure we have valid coordinates
         assert self.within_bounds(x, y)
-        return
+
+        tile = self.__v_board[y][x]
+        if tile == self.__FLAG_TILE:
+            self.__v_board[y][x] = self.__HIDDEN_TILE
+            return True
+        elif tile == self.__HIDDEN_TILE:
+            self.__v_board[y][x] = self.__FLAG_TILE
+            return True
+        return False
+
+    def reset(self):
+        """
+        Resets the visual board to hidden tiles.
+        """
+        self.__v_board = [[self.__HIDDEN_TILE for i in range(self.width)] for j in range(self.height)]
