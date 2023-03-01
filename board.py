@@ -96,16 +96,16 @@ class Board:
             # if the tile was empty and has no adjacent mines, then we want to poke the tiles around it as well so that
             # the player does not have to enter a bunch of unnecessary poke commands
             if self.__adjacent_mine_count(x, y) == 0:
-                for tile in self.__adjacent_tiles(x, y):
+                for tile in self.__adjacent_coords(x, y):
                     self.poke(tile[0], tile[1])
 
             return False
 
 
-    def __adjacent_tiles(self, x, y):
+    def __adjacent_coords(self, x, y):
         """
-        Obtains all coordinates adjacent to the given one. If an adjacent tile would be outside the bounds of the board,
-        it is not included in the result.
+        Obtains all coordinates adjacent to the given one. If an adjacent coordinate would be outside the bounds of the
+        board, it is not included in the result.
         :param x: the x-axis coordinate. Must be greater than 0 and less than the width of the board.
         :param y: the y-axis coordinate. Must be greater than 0 and less than the height of the board.
         :return: a list of tuples (x, y), each representing a coordinate pair adjacent to the given coordinates.
@@ -114,12 +114,24 @@ class Board:
         assert self.within_bounds(x, y)
         #               NW,       N,       NE,      E,      SE,     S,      SW,      W
         translations = [(-1, -1), (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0)]
-        adj_tiles = []
+        adj_coords = []
         for t in translations:
             if self.within_bounds(x + t[0], y + t[1]):
-                adj_tiles.append((x + t[0], y + t[1]))
+                adj_coords.append((x + t[0], y + t[1]))
 
-        return adj_tiles
+        return adj_coords
+
+    def __adjacent_tiles(self, x, y):
+        """
+        Obtains all tiles adjacent to the given one. If an adjacent tile would be outside the bounds of the board, it is
+         not included in the result.
+        :param x: the x-axis coordinate. Must be greater than 0 and less than the width of the board.
+        :param y: the y-axis coordinate. Must be greater than 0 and less than the height of the board.
+        :return: a list of characters, each representing a tile adjacent to the given coordinates.
+        """
+        # make sure we have valid coordinates
+        assert self.within_bounds(x, y)
+        return list(map(lambda coords : self.h_board[coords[1]][coords[0]], self.__adjacent_coords(x, y)))
 
     def __adjacent_mine_count(self, x, y):
         """
@@ -130,7 +142,7 @@ class Board:
         """
         # make sure we have valid coordinates
         assert self.within_bounds(x, y)
-        # TODO
+        adj_tiles = self.__adjacent_coords(x, y)
         count = 0
         return count
 
