@@ -37,8 +37,8 @@ class Board:
         """
         self.width = len(h_board[0])
         self.height = len(h_board)
-        self.h_board = h_board
-        self.v_board = [['.' for i in range(self.width)] for j in range(self.height)]
+        self.__h_board = h_board
+        self.__v_board = [['.' for i in range(self.width)] for j in range(self.height)]
         self.__MINE_TILE = 'M'
         self.__EMPTY_TILE = '.'
         self.__HIDDEN_TILE = 'H'
@@ -61,7 +61,7 @@ class Board:
         output += "\n"
         output += "y \n"
         for y in range(self.height):
-            output += str(y) + "  " + ' '.join(self.v_board[y]) + "\n"
+            output += str(y) + "  " + ' '.join(self.__v_board[y]) + "\n"
 
         return output
 
@@ -86,11 +86,11 @@ class Board:
         # make sure we have valid coordinates
         assert self.within_bounds(x, y)
 
-        poked_char = self.h_board[y][x]
+        poked_char = self.__h_board[y][x]
         
         if poked_char == self.__MINE_TILE:
             # update the visible board
-            self.v_board[y][x] = poked_char
+            self.__v_board[y][x] = poked_char
             return True
         elif poked_char == self.__EMPTY_TILE:
             # if the tile was empty and has no adjacent mines, then we want to poke the tiles around it as well so that
@@ -131,7 +131,7 @@ class Board:
         """
         # make sure we have valid coordinates
         assert self.within_bounds(x, y)
-        return list(map(lambda coords : self.h_board[coords[1]][coords[0]], self.__adjacent_coords(x, y)))
+        return list(map(lambda coords : self.__h_board[coords[1]][coords[0]], self.__adjacent_coords(x, y)))
 
     def __adjacent_mine_count(self, x, y):
         """
@@ -142,9 +142,7 @@ class Board:
         """
         # make sure we have valid coordinates
         assert self.within_bounds(x, y)
-        adj_tiles = self.__adjacent_coords(x, y)
-        count = 0
-        return count
+        return self.__adjacent_tiles(x, y).count(self.__MINE_TILE)
 
     def flag(self, x, y):
         """

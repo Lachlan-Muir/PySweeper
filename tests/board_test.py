@@ -11,9 +11,9 @@ class TestBoard(unittest.TestCase):
     def test_init(self):
         self.assertEqual(self.board_3x3.width, 3)
         self.assertEqual(self.board_3x3.height, 3)
-        self.assertEqual(self.board_3x3.v_board, [['.', '.', '.'],
-                                             ['.', '.', '.'],
-                                             ['.', '.', '.']])
+        self.assertEqual(self.board_3x3._Board__v_board, [['.', '.', '.'],
+                                                    ['.', '.', '.'],
+                                                    ['.', '.', '.']])
 
     def test_str(self):
         self.assertEqual(" x 0 1 2 \n" +
@@ -51,6 +51,12 @@ class TestBoard(unittest.TestCase):
     def test_adjacent_tiles(self):
         self.assertEqual(['.', '.', '.', '.', 'M'], self.board_3x3._Board__adjacent_tiles(1, 0))
         self.assertEqual(['M', '.', '.', '.', '.', '.', '.', '.'], self.board_3x3._Board__adjacent_tiles(1, 1))
+
+
+    def test_adjacent_mine_count(self):
+        self.assertEqual(1, self.board_3x3._Board__adjacent_mine_count(1, 1))
+        self.assertEqual(1, self.board_3x3._Board__adjacent_mine_count(1, 0))
+        self.assertEqual(0, self.board_3x3._Board__adjacent_mine_count(2, 2))
 
 
 if __name__ == '__main__':
