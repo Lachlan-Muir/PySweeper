@@ -11,16 +11,16 @@ class TestBoard(unittest.TestCase):
     def test_init(self):
         self.assertEqual(self.board_3x3.width, 3)
         self.assertEqual(self.board_3x3.height, 3)
-        self.assertEqual(self.board_3x3._Board__v_board, [['.', '.', '.'],
-                                                    ['.', '.', '.'],
-                                                    ['.', '.', '.']])
+        self.assertEqual(self.board_3x3._Board__v_board, [['H', 'H', 'H'],
+                                                          ['H', 'H', 'H'],
+                                                          ['H', 'H', 'H']])
 
     def test_str(self):
         self.assertEqual(" x 0 1 2 \n" +
                          "y \n"       +
-                         "0  . . .\n" +
-                         "1  . . .\n" +
-                         "2  . . .\n", str(self.board_3x3))
+                         "0  H H H\n" +
+                         "1  H H H\n" +
+                         "2  H H H\n", str(self.board_3x3))
 
     def test_within_bounds(self):
         # test outer edges of board within range
@@ -57,6 +57,17 @@ class TestBoard(unittest.TestCase):
         self.assertEqual(1, self.board_3x3._Board__adjacent_mine_count(1, 1))
         self.assertEqual(1, self.board_3x3._Board__adjacent_mine_count(1, 0))
         self.assertEqual(0, self.board_3x3._Board__adjacent_mine_count(2, 2))
+
+    def test_poke(self):
+        self.assertFalse(self.board_3x3.poke(1, 1))
+        self.assertEqual([['H', 'H', 'H'],
+                          ['H', '1', 'H'],
+                          ['H', 'H', 'H']], self.board_3x3._Board__v_board)
+        self.assertFalse(self.board_3x3.poke(2, 2))
+        self.assertEqual([['H', '1', '0'],
+                          ['1', '1', '0'],
+                          ['0', '0', '0']], self.board_3x3._Board__v_board)
+        self.assertTrue(self.board_3x3.poke(0, 0))
 
 
 if __name__ == '__main__':

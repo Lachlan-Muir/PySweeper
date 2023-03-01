@@ -23,26 +23,29 @@ class Board:
     Attributes:
         width       The width (x-axis) of the board
         height      The height (y-axis) of the board
-        h_board     The board hidden from the player
-        v_board     The board visible to the player
 
     Methods:
         poke(x, y)  Reveals the tile at the given coordinates to the player
         flag(x, y)  Places a flag at the given coordinates
+        within_bounds(x, y) Checks if the given x, y coordinates are within the bounds of the board.
     """
 
     def __init__(self, h_board):
         """
         :param h_board: A two-dimensional array of characters representing the board hidden from the player.
         """
-        self.width = len(h_board[0])
-        self.height = len(h_board)
-        self.__h_board = h_board
-        self.__v_board = [['.' for i in range(self.width)] for j in range(self.height)]
         self.__MINE_TILE = 'M'
+        # empty tile only used in hidden board; empty tiles on v_board are represented by their adjacent mine counts
         self.__EMPTY_TILE = '.'
         self.__HIDDEN_TILE = 'H'
         self.__FLAG_TILE = 'F'
+        self.width = len(h_board[0])
+        self.height = len(h_board)
+        # The board hidden from the player
+        self.__h_board = h_board
+        # The board visible to the player
+        self.__v_board = [[self.__HIDDEN_TILE for i in range(self.width)] for j in range(self.height)]
+
 
     def __str__(self):
         """
@@ -86,21 +89,25 @@ class Board:
         # make sure we have valid coordinates
         assert self.within_bounds(x, y)
 
-        poked_char = self.__h_board[y][x]
-        
-        if poked_char == self.__MINE_TILE:
-            # update the visible board
-            self.__v_board[y][x] = poked_char
-            return True
-        elif poked_char == self.__EMPTY_TILE:
-            # if the tile was empty and has no adjacent mines, then we want to poke the tiles around it as well so that
-            # the player does not have to enter a bunch of unnecessary poke commands
-            if self.__adjacent_mine_count(x, y) == 0:
-                for tile in self.__adjacent_coords(x, y):
-                    self.poke(tile[0], tile[1])
+        # check if the tile has been poked before; if it has we don't have to do anything
+        if self.__v_board[y][x] == self.__HIDDEN_TILE:
+            poked_char = self.__h_board[y][x]
 
-            return False
+            if poked_char == self.__MINE_TILE:
+                # if the tile we poked was a mine, we don't have to do anything other than show it on the visible board,
+                # since the game will end as a result.
+                self.__v_board[y][x] = poked_char
+                return True
+            elif poked_char == self.__EMPTY_TILE:
+                mine_ct = self.__adjacent_mine_count(x, y)
+                self.__v_board[y][x] = str(mine_ct)
+                # if the tile was empty and has no adjacent mines, then we want to poke the tiles around it as well
+                # so that the player does not have to enter a bunch of unnecessary poke commands
+                if mine_ct == 0:
+                    for coord in self.__adjacent_coords(x, y):
+                        self.poke(coord[0], coord[1])
 
+        return False
 
     def __adjacent_coords(self, x, y):
         """
