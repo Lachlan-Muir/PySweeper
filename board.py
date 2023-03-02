@@ -21,13 +21,17 @@ class Board:
     integers. Flags places by the player are represented by 'F'.
 
     Attributes:
-        width       The width (x-axis) of the board
-        height      The height (y-axis) of the board
+        width                               The width (x-axis) of the board
+        height                              The height (y-axis) of the board
+        unrevealed_tile_count               The number of tiles which have not yet been revealed
+        mine_count                          The number of mines on the board
 
     Methods:
-        poke(x, y)  Reveals the tile at the given coordinates to the player
-        flag(x, y)  Places a flag at the given coordinates
-        within_bounds(x, y) Checks if the given x, y coordinates are within the bounds of the board.
+        poke(x, y)                          Reveals the tile at the given coordinates to the player
+        flag(x, y)                          Places a flag at the given coordinates
+        within_bounds(x, y)                 Checks if the given x, y coordinates are within the bounds of the board.
+        reset()                             Resets the visual board to be fully hidden.
+        evaluate()                          Checks if the board has been solved.
     """
 
     def __init__(self, h_board):
@@ -41,6 +45,8 @@ class Board:
         self.__FLAG_TILE = 'F'
         self.width = len(h_board[0])
         self.height = len(h_board)
+        self.unrevealed_tile_count = self.width * self.height
+        self.mine_count = sum([row.count(self.__MINE_TILE) for row in h_board])
         # The board hidden from the player
         self.__h_board = h_board
         # The board visible to the player
@@ -79,7 +85,8 @@ class Board:
     def poke(self, x, y):
         """
         Takes x and y coordinates and reveals the tile at that location on the board to the player. Nearby tiles
-        which do not have mines adjacent to them are also revealed. The hidden board is not modified.
+        which do not have mines adjacent to them are also revealed. The hidden board is not modified. Adjusts unrevealed
+        tile count.
 
         :param x: the x-axis coordinate. Must be greater than 0 and less than the width of the board.
         :param y: the y-axis coordinate. Must be greater than 0 and less than the height of the board.
@@ -89,8 +96,9 @@ class Board:
         assert self.within_bounds(x, y)
 
         # check if the tile has been poked before; if it has we don't have to do anything
-        if self.__v_board[y][x] == self.__HIDDEN_TILE:
+        if self.__v_board[y][x] == self.__HIDDEN_TILE or self.__v_board[y][x] == self.__FLAG_TILE:
             poked_char = self.__h_board[y][x]
+            self.unrevealed_tile_count -= 1
 
             if poked_char == self.__MINE_TILE:
                 # if the tile we poked was a mine, we don't have to do anything other than show it on the visible board,
@@ -177,3 +185,13 @@ class Board:
         Resets the visual board to hidden tiles.
         """
         self.__v_board = [[self.__HIDDEN_TILE for i in range(self.width)] for j in range(self.height)]
+
+    def evaluate(self):
+        """
+        Checks if the game has been completed. Fails if called on a failed board (if a mine has been poked already)
+        :return: True if the board is in a complete state. False otherwise.
+        """
+        assert self.unrevealed_tile_count >= self.mine_count, "Cannot evaluate a failed board for victory."
+        if self.unrevealed_tile_count == self.mine_count:
+            return True
+        return False
